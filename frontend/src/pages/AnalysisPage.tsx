@@ -43,7 +43,7 @@ export function AnalysisPage() {
       validate: (value) => value instanceof File || "Image is required."
     });
     register("location", {
-      validate: (value) => Boolean(value) || "Location is required."
+      validate: (value) => Boolean(value) || "Observation site is required."
     });
   }, [register]);
 
@@ -114,7 +114,7 @@ export function AnalysisPage() {
           <Card className="lg:row-span-2">
             <div className="mb-5">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-ocean-600">
-                Location
+                Observation Site
               </p>
               <h2 className="mt-2 text-2xl font-semibold text-research-ink">
                 Monterey Bay Map
@@ -183,7 +183,7 @@ export function AnalysisPage() {
 
         <div className="flex flex-col gap-4 rounded-2xl border border-research-line bg-white/82 p-5 shadow-research sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm leading-6 text-research-muted">
-            Image, date, time, and Monterey Bay location are required before
+            Image, date, time, and Monterey Bay observation site are required before
             submission.
           </p>
           <Button
@@ -224,4 +224,3 @@ export function AnalysisPage() {
     </div>
   );
 }
-
