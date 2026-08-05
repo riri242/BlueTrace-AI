@@ -1,5 +1,7 @@
 from fastapi import HTTPException, UploadFile, status
 
+from app.services.environment_service import EnvironmentService
+
 from app.schemas.analysis import (
   AnalysisRequest,
   AnalysisResponse,
@@ -46,17 +48,33 @@ async def validate_image_upload(image: UploadFile) -> ImageMetadata:
         size_bytes=len(contents),
     )
 
-
 async def create_analysis_response(
     payload: AnalysisRequest,
     image: UploadFile,
 ) -> AnalysisResponse:
+    """
+    Validate the uploaded image, retrieve historical environmental
+    conditions for the selected observation, and return the analysis
+    response.
+    """
+
+    # Validate uploaded image
     image_metadata = await validate_image_upload(image)
 
-    # Milestone 1 intentionally performs intake validation only.
+    # Retrieve environmental conditions
+    environment_service = EnvironmentService()
+
+    environment = await environment_service.get_environment(
+        latitude=payload.latitude,
+        longitude=payload.longitude,
+        date=payload.date.isoformat(),
+        time=payload.time.strftime("%H:%M"),
+    )
+
+    # Return response
     return AnalysisResponse(
         status="success",
-        message="Milestone 1 completed.",
+        message="Environmental conditions retrieved successfully.",
         received=ReceivedPayload(
             date=payload.date.isoformat(),
             image=image_metadata,
@@ -64,4 +82,5 @@ async def create_analysis_response(
             longitude=payload.longitude,
             time=payload.time.isoformat(timespec="minutes"),
         ),
+        environment=environment,
     )

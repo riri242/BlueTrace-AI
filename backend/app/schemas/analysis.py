@@ -7,6 +7,8 @@ from pydantic import BaseModel, Field
 
 from app.utils.geo import MONTEREY_BAY_BOUNDS
 
+from app.schemas.environment import EnvironmentData
+
 
 class AnalysisRequest(BaseModel):
     date: DateType
@@ -41,3 +43,4 @@ class AnalysisResponse(BaseModel):
     status: Literal["success"]
     message: str
     received: ReceivedPayload
+    environment: EnvironmentData | None = None
