@@ -1,46 +1,95 @@
 # BlueTrace AI
 
-BlueTrace AI is a production-oriented research foundation for future marine debris origin estimation. Milestone 1 establishes the full-stack intake workflow only: image upload, observation date and time, Monterey Bay location capture, request validation, and API integration.
+**AI-powered marine debris analysis and origin estimation.**
 
-No AI, machine learning, object detection, datasets, or simulated inference are implemented in this milestone.
+BlueTrace AI is a research-oriented platform exploring how **computer vision, environmental data, and geospatial analysis** can be combined to analyze marine debris and estimate potential origins.
+
+The system processes marine debris observations — including an image, geographic location, date, and time — through an analysis pipeline incorporating **YOLO-based object detection, environmental data, and location scoring**.
+
+> **Status:** 🚧 Active development. The analysis pipeline is functional, with ongoing work on model validation and prediction quality.
+
+## Features
+
+* Marine debris image upload and validation
+* Geographic observation capture with Mapbox
+* Observation date and time recording
+* YOLO-based object detection
+* Environmental data integration
+* Location classification and scoring
+* REST API for analysis
+* Modular frontend and backend architecture
 
 ## Architecture
 
-The project is split into independent frontend and backend applications.
-
 ```text
-BlueTrace AI/
-├── frontend/
-│   ├── src/
-│   │   ├── assets/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── layouts/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── styles/
-│   │   └── types/
-│   └── ...
-├── backend/
-│   ├── app/
-│   │   ├── core/
-│   │   ├── routers/
-│   │   ├── schemas/
-│   │   ├── services/
-│   │   └── utils/
-│   └── ...
-└── .env.example
+Observation
+    │
+    ├── Image
+    ├── Date & Time
+    └── Location
+          │
+          ▼
+    React Frontend
+          │
+          ▼
+     FastAPI API
+          │
+     ┌────┴────┐
+     ▼         ▼
+   YOLO    Environment
+ Detection    Data
+     │         │
+     └────┬────┘
+          ▼
+   Location Scoring
+          │
+          ▼
+    Origin Estimate
 ```
 
 ## Tech Stack
 
-Frontend: React, Vite, TypeScript, TailwindCSS, Framer Motion, React Hook Form, React Query, Axios, and Mapbox GL JS.
+**Frontend**
 
-Backend: FastAPI, Python, Pydantic, and Uvicorn.
+React · TypeScript · Vite · TailwindCSS · Framer Motion · React Hook Form · React Query · Axios · Mapbox GL JS
 
-## Installation
+**Backend**
 
-Copy the example environment files and add your Mapbox token:
+Python · FastAPI · Pydantic · Uvicorn
+
+**AI & Data**
+
+YOLO · Machine Learning · Geospatial Analysis · Environmental Data
+
+## Project Structure
+
+```text
+BlueTrace AI/
+├── frontend/
+│   └── src/
+│       ├── assets/
+│       ├── components/
+│       ├── hooks/
+│       ├── layouts/
+│       ├── pages/
+│       ├── services/
+│       ├── styles/
+│       └── types/
+│
+├── backend/
+│   └── app/
+│       ├── core/
+│       ├── routers/
+│       ├── schemas/
+│       ├── services/
+│       └── utils/
+│
+└── .env.example
+```
+
+## Getting Started
+
+### Environment Variables
 
 ```bash
 cp .env.example .env
@@ -48,78 +97,69 @@ cp frontend/.env.example frontend/.env
 cp backend/.env.example backend/.env
 ```
 
-Install frontend dependencies:
+Add the required environment variables, including the Mapbox access token.
+
+### Frontend
 
 ```bash
 cd frontend
 npm install
+npm run dev
 ```
 
-Install backend dependencies:
+The frontend runs at `http://localhost:5173`.
+
+### Backend
 
 ```bash
 cd backend
 python -m venv .venv
+```
+
+**Windows:**
+
+```powershell
 .venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
 ```
 
-## Run Frontend
+Start the API:
 
 ```bash
-cd frontend
-npm run dev
-```
-
-The Vite app runs at `http://localhost:5173`.
-
-## Run Backend
-
-```bash
-cd backend
 uvicorn app.main:app --reload --port 8000
 ```
 
-The API runs at `http://localhost:8000`.
+API documentation is available at:
+
+`http://localhost:8000/docs`
 
 ## API
 
-`POST /api/v1/analyze`
+### `POST /api/v1/analyze`
 
-Accepts `multipart/form-data`:
+Accepts a marine debris observation using `multipart/form-data`.
 
-- `image`
-- `date`
-- `time`
-- `latitude`
-- `longitude`
+| Field       | Description           |
+| ----------- | --------------------- |
+| `image`     | Marine debris image   |
+| `date`      | Observation date      |
+| `time`      | Observation time      |
+| `latitude`  | Observation latitude  |
+| `longitude` | Observation longitude |
 
-Returns:
+The endpoint processes the observation and returns the available environmental information, object detections, and prediction results.
 
-```json
-{
-  "status": "success",
-  "message": "Milestone 1 completed.",
-  "received": {
-    "date": "2026-08-03",
-    "time": "12:30",
-    "latitude": 36.8,
-    "longitude": -121.95,
-    "image": {
-      "filename": "sample.jpg",
-      "content_type": "image/jpeg",
-      "size_bytes": 123456
-    }
-  }
-}
-```
+## Development Status
 
-## Future Milestones
+BlueTrace AI is an **active research and engineering project**. The current implementation includes the core observation workflow, YOLO-based detection, environmental-data integration, and an initial location-scoring pipeline.
 
-- Computer vision model experimentation and evaluation.
-- Ocean current, tide, weather, and wind data ingestion.
-- Research data storage and provenance tracking.
-- Model training pipelines and reproducible experiments.
-- Explainable origin estimation and uncertainty reporting.
-- Field-ready analyst dashboards and export workflows.
+Prediction quality and the underlying analysis methodology are still being validated and refined.
 
+## License
+
+This project is currently under development. Licensing terms will be added when finalized.
