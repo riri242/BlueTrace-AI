@@ -4,9 +4,11 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import type { DriftPoint } from "@/types/drift";
 
+type CoastlineStatus = "potential_land_crossing" | "clear_on_reference_map" | "not_checked";
+
 const TOKEN = import.meta.env.VITE_MAPBOX_TOKEN?.trim() ?? "";
 
-export function DriftPathMap({ path }: { path: DriftPoint[] }) {
+export function DriftPathMap({ path, coastlineStatus }: { path: DriftPoint[]; coastlineStatus?: CoastlineStatus }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapboxMap | null>(null);
 
@@ -58,7 +60,11 @@ export function DriftPathMap({ path }: { path: DriftPoint[] }) {
     <div className="mt-5 space-y-2">
       <div ref={containerRef} className="h-80 w-full overflow-hidden rounded-2xl border border-research-line" aria-label="Experimental backward drift route map" />
       <p className="text-sm text-research-muted">
-        Blue marker: observation anchor. Orange marker: oldest calculated position. This is an experimental line, not a verified marine route; coastline crossings are not yet validated.
+        Blue marker: observation anchor. Orange marker: oldest calculated position. {coastlineStatus === "potential_land_crossing"
+          ? "This experimental line intersects mapped land and is not a valid marine trajectory."
+          : coastlineStatus === "clear_on_reference_map"
+            ? "No land crossing was detected on the reference map. This experimental line is not a verified marine route."
+            : "Coastline screening was not completed. This experimental line is not a verified marine route."}
       </p>
     </div>
   );
