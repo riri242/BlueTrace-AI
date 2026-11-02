@@ -10,7 +10,8 @@ from pathlib import Path
 
 
 def check_coastline(path: list[dict], dataset_path: str | None = None) -> str:
-    dataset = dataset_path or os.getenv("BLUETRACE_LAND_GEOJSON")
+    default_dataset = Path(__file__).resolve().parents[2] / "data" / "monterey_land.geojson"
+    dataset = dataset_path or os.getenv("BLUETRACE_LAND_GEOJSON") or str(default_dataset)
     if not dataset or not Path(dataset).is_file() or len(path) < 2:
         return "not_checked"
     try:
