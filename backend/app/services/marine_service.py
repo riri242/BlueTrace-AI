@@ -126,6 +126,15 @@ class MarineService:
         if not isinstance(hourly, dict) or not isinstance(hourly.get("time"), list):
             raise ValueError("Marine history response is missing hourly timestamps.")
 
+        units = data.get("hourly_units")
+        if not isinstance(units, dict):
+            raise ValueError("Marine provider omitted hourly units.")
+        speed_unit = units.get("ocean_current_velocity")
+        if speed_unit not in ("km/h", "m/s", "kn", "mph"):
+            raise ValueError("Unsupported or missing marine current velocity unit.")
+        if units.get("ocean_current_direction") not in ("°", "degrees"):
+            raise ValueError("Unsupported or missing marine current direction unit.")
+
         observations = []
         for index, timestamp in enumerate(hourly["time"]):
             try:
@@ -161,13 +170,8 @@ class MarineService:
             "start_at": start.isoformat(timespec="minutes"),
             "end_at": target.isoformat(timespec="minutes"),
             "hours_requested": hours,
-            "units": {
-                "wave_height": "m",
-                "wave_direction": "degrees",
-                "wave_period": "s",
-                "ocean_current_velocity": "km/h",
-                "ocean_current_direction": "degrees",
-                "sea_surface_temperature": "°C",
-            },
+            "units": units,
+            "grid_latitude": data.get("latitude"),
+            "grid_longitude": data.get("longitude"),
             "observations": observations,
         }
