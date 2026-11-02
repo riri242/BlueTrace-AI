@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 
 from app.schemas.drift import DriftRequest
 from app.services.backward_drift_service import estimate_backward_drift
+from app.services.coastline_validation import check_coastline
 from app.services.marine_service import MarineService
 
 logger = logging.getLogger(__name__)
@@ -61,12 +62,14 @@ async def calculate_drift(request: DriftRequest, marine_service=None) -> dict:
     if offset_hours < 0 or offset_hours > 1.5:
         return unavailable("No current reading sufficiently close to the observation time.")
 
+    coastline_status = check_coastline(result["path"])
     return {
         **base,
         "status": "experimental",
+        "coastline_status": coastline_status,
         "hours_traced": result["hours_traced"],
         "anchor_time": result["anchor_time"],
         "observation_offset_minutes": round(offset_hours * 60, 2),
         "path": result["path"],
-        "message": "Experimental current-only backward trace; not a source attribution.",
+        "message": ("Potential land crossing detected; do not interpret this path as a marine trajectory." if coastline_status == "potential_land_crossing" else "Experimental current-only backward trace; not a source attribution."),
     }
