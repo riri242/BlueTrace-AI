@@ -55,3 +55,13 @@ From the repository's `backend` directory:
 - [ ] Quantify uncertainty and compare against independent drift observations
 
 Weather API 429 resilience is intentionally deferred; the drift endpoint does not call the weather API.
+
+## November 2026 follow-up
+
+- Frontend now renders a separate Mapbox line for the backward drift track and labels the observation anchor and oldest calculated point.
+- The API exposes `anchor_time` and `observation_offset_minutes`.
+- Marine history reads provider `hourly_units` for current speed and direction and converts supported speed units to km/h.
+- An ambiguous or nonexistent Los Angeles local time during a daylight-saving transition is rejected conservatively.
+- An observation from October 21, 2026 returned 23 hours of an experimental 24-hour requested track in a live user test (prior to these changes).
+
+**Outstanding:** Coastline intersection is not yet computationally verified; the displayed basemap is for human inspection, not a geographic land mask. The provider's directional convention has not been independently confirmed, and no reference trajectories have been used for scientific validation. Historical coverage outside the tested dates remains unverified. New code and tests require local execution.
