@@ -130,7 +130,7 @@ class MarineService:
         if not isinstance(units, dict):
             raise ValueError("Marine provider omitted hourly units.")
         speed_unit = units.get("ocean_current_velocity")
-        if speed_unit not in ("km/h", "m/s", "kn", "mph"):
+        if speed_unit not in ("km/h", "m/s", "kn", "knots", "mph"):
             raise ValueError("Unsupported or missing marine current velocity unit.")
         if units.get("ocean_current_direction") not in ("°", "degrees"):
             raise ValueError("Unsupported or missing marine current direction unit.")
