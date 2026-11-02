@@ -99,3 +99,27 @@ run the new test suite, compare tracks against independent drifter/buoy
 observations, and quantify uncertainty. Open-Meteo warns that coastal current
 model accuracy is limited at its approximately 8 km resolution. Older dates
 may require the provider's historical forecast mode.
+
+## November 2, 2026 integration update
+
+- The backend now defaults to `backend/data/monterey_land.geojson` when `BLUETRACE_LAND_GEOJSON` is unset; the environment variable still overrides the default. The GeoJSON is a **local runtime prerequisite**, not automatically downloaded or committed.
+- The frontend map disclaimer now reflects `potential_land_crossing`, `clear_on_reference_map`, or `not_checked` rather than always claiming no coastline validation.
+- A user-run Monterey Bay scenario on October 24, 2026 returned `potential_land_crossing` in the API and showed the corresponding UI warning. This verifies the end-to-end screening path for that scenario, not the geographic correctness of the coastline data or the physical accuracy of the drift.
+- User previously reported 26/26 backend unit tests passing **before these latest edits**. Re-run backend tests and frontend build after pulling the branch.
+
+### Phase-1 engineering versus scientific completion
+
+Engineering acceptance: local dataset readable, both `potential_land_crossing` and `clear_on_reference_map` behavior tested, missing/bad data fails closed as `not_checked`, backend tests pass, frontend builds, and end-to-end API/UI smoke test passes after these changes.
+
+Scientific acceptance remains **open**: compare predicted tracks with independent real drifter observations, measure error and uncertainty, and document the limits of fixed-location currents and nearshore model resolution. Do not label the output as verified debris source attribution.
+
+### Local verification
+
+From project root, pull `feat/marine-environment-data`. Confirm `backend/data/monterey_land.geojson` exists. From `backend` run:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+```
+
+From `frontend` run `npm run build` and open the app for a drift smoke test. No manual environment variable is required when the default GeoJSON file exists.
