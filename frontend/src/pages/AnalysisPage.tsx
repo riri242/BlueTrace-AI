@@ -269,6 +269,13 @@ export function AnalysisPage() {
             </p>
           ) : null}
           <p className="mt-2 text-sm text-research-muted">{driftMutation.data.limitations}</p>
+          <p className="mt-2 text-sm font-medium text-research-ink">
+            Coastline screening: {driftMutation.data.coastline_status === "potential_land_crossing"
+              ? "Potential land crossing detected — route not valid as a marine track."
+              : driftMutation.data.coastline_status === "clear_on_reference_map"
+                ? "No land crossing on the configured reference map (not a navigation guarantee)."
+                : "Not checked — coastline dataset is not configured."}
+          </p>
           <DriftPathMap path={driftMutation.data.path} />
           <pre className="mt-4 max-h-[28rem] overflow-auto rounded-2xl bg-research-ink p-5 text-sm leading-6 text-ocean-50">
             {JSON.stringify(driftMutation.data, null, 2)}
