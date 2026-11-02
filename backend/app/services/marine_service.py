@@ -35,7 +35,6 @@ class MarineService:
             "hourly": ",".join(self.HOURLY_VARIABLES),
             "timezone": "America/Los_Angeles",
             "cell_selection": "sea",
-            "wind_speed_unit": "kmh",
         }
 
         try:
