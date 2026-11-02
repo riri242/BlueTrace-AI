@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useAnalyzeSubmission } from "@/hooks/useAnalyzeSubmission";
+import { useDriftEstimate } from "@/hooks/useDriftEstimate";
 import { useImagePreview } from "@/hooks/useImagePreview";
 import type { Coordinates } from "@/types/analysis";
 
@@ -22,6 +23,8 @@ const maxPhotoDate = new Date().toISOString().slice(0, 10);
 
 export function AnalysisPage() {
   const mutation = useAnalyzeSubmission();
+  const driftMutation = useDriftEstimate();
+  const [driftHours, setDriftHours] = useState(24);
   const {
     formState: { errors },
     handleSubmit,
@@ -57,6 +60,17 @@ export function AnalysisPage() {
     Boolean(selectedDate) &&
     Boolean(selectedTime) &&
     Boolean(selectedLocation);
+
+  const runDrift = () => {
+    if (!selectedDate || !selectedTime || !selectedLocation) return;
+    driftMutation.mutate({
+      date: selectedDate,
+      time: selectedTime,
+      latitude: selectedLocation.latitude,
+      longitude: selectedLocation.longitude,
+      hours: driftHours
+    });
+  };
 
   const onSubmit = (values: AnalysisFormValues) => {
     if (!(values.image instanceof File) || !values.location) {
@@ -102,6 +116,7 @@ export function AnalysisPage() {
               file={selectedImage}
               onFileSelect={(file) => {
                 mutation.reset();
+                driftMutation.reset();
                 setValue("image", file, {
                   shouldDirty: true,
                   shouldValidate: true
@@ -186,6 +201,35 @@ export function AnalysisPage() {
             Image, date, time, and Monterey Bay observation site are required before
             submission.
           </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="text-sm font-medium text-research-ink" htmlFor="drift-hours">
+              Drift history (hours)
+            </label>
+            <select
+              className="min-h-11 rounded-xl border border-research-line bg-white px-3 text-research-ink"
+              id="drift-hours"
+              value={driftHours}
+              onChange={(event) => {
+                setDriftHours(Number(event.target.value));
+                driftMutation.reset();
+              }}
+            >
+              <option value={6}>6</option>
+              <option value={12}>12</option>
+              <option value={24}>24</option>
+              <option value={48}>48</option>
+              <option value={72}>72</option>
+            </select>
+            <Button
+              disabled={!selectedDate || !selectedTime || !selectedLocation || driftMutation.isPending}
+              isLoading={driftMutation.isPending}
+              size="lg"
+              type="button"
+              onClick={runDrift}
+            >
+              Estimate Drift
+            </Button>
+          </div>
           <Button
             disabled={!canAnalyze}
             isLoading={mutation.isPending}
@@ -196,6 +240,32 @@ export function AnalysisPage() {
           </Button>
         </div>
       </form>
+
+      {driftMutation.error ? (
+        <Card className="mt-6 border-red-200 bg-red-50/80 shadow-none">
+          <p className="font-semibold text-red-900">Drift request failed</p>
+          <p className="mt-2 text-sm text-red-800">{driftMutation.error.message}</p>
+        </Card>
+      ) : null}
+
+      {driftMutation.data ? (
+        <Card className="mt-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-ocean-600">
+            Backward Drift Estimate
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold text-research-ink">
+            {driftMutation.data.status === "experimental" ? "Experimental trace" : "Marine history unavailable"}
+          </h2>
+          <p className="mt-3 text-sm text-research-muted">{driftMutation.data.message}</p>
+          <p className="mt-2 text-sm text-research-muted">
+            Traced {driftMutation.data.hours_traced} of {driftMutation.data.hours_requested} requested hours.
+          </p>
+          <p className="mt-2 text-sm text-research-muted">{driftMutation.data.limitations}</p>
+          <pre className="mt-4 max-h-[28rem] overflow-auto rounded-2xl bg-research-ink p-5 text-sm leading-6 text-ocean-50">
+            {JSON.stringify(driftMutation.data, null, 2)}
+          </pre>
+        </Card>
+      ) : null}
 
       {mutation.error ? (
         <Card className="mt-6 border-red-200 bg-red-50/80 shadow-none">
