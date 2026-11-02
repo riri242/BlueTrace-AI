@@ -33,6 +33,9 @@ class DriftResponse(BaseModel):
     observation_time: str
     hours_requested: int
     hours_traced: float = 0
+    anchor_time: str | None = None
+    observation_offset_minutes: float | None = None
+    coastline_status: Literal["not_checked", "potential_land_crossing", "clear_on_reference_map"] = "not_checked"
     source: str = "Open-Meteo Marine Weather API"
     method: str = "fixed-location-current-only-backward-euler"
     path: list[DriftPoint] = Field(default_factory=list)
