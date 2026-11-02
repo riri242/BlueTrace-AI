@@ -276,7 +276,7 @@ export function AnalysisPage() {
                 ? "No land crossing on the configured reference map (not a navigation guarantee)."
                 : "Not checked — coastline dataset is not configured."}
           </p>
-          <DriftPathMap path={driftMutation.data.path} />
+          <DriftPathMap path={driftMutation.data.path} coastlineStatus={driftMutation.data.coastline_status} />
           <pre className="mt-4 max-h-[28rem] overflow-auto rounded-2xl bg-research-ink p-5 text-sm leading-6 text-ocean-50">
             {JSON.stringify(driftMutation.data, null, 2)}
           </pre>
