@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 
 import { FileUpload } from "@/components/forms/FileUpload";
 import { MontereyMap } from "@/components/map/MontereyMap";
+import { DriftPathMap } from "@/components/map/DriftPathMap";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
@@ -139,6 +140,7 @@ export function AnalysisPage() {
               error={errors.location?.message}
               onChange={(coordinates) => {
                 mutation.reset();
+                driftMutation.reset();
                 setValue("location", coordinates, {
                   shouldDirty: true,
                   shouldValidate: true
@@ -260,7 +262,14 @@ export function AnalysisPage() {
           <p className="mt-2 text-sm text-research-muted">
             Traced {driftMutation.data.hours_traced} of {driftMutation.data.hours_requested} requested hours.
           </p>
+          {driftMutation.data.anchor_time ? (
+            <p className="mt-2 text-sm text-research-muted">
+              Latest current reading: {driftMutation.data.anchor_time} (Monterey local time).
+              Offset from observation: {driftMutation.data.observation_offset_minutes ?? "unknown"} minutes.
+            </p>
+          ) : null}
           <p className="mt-2 text-sm text-research-muted">{driftMutation.data.limitations}</p>
+          <DriftPathMap path={driftMutation.data.path} />
           <pre className="mt-4 max-h-[28rem] overflow-auto rounded-2xl bg-research-ink p-5 text-sm leading-6 text-ocean-50">
             {JSON.stringify(driftMutation.data, null, 2)}
           </pre>
