@@ -20,6 +20,15 @@ class MarineHistoryPreprocessorTests(unittest.TestCase):
         self.assertEqual(result["observations"][0]["observed_at"], "2026-10-23T08:00")
         self.assertEqual(result["observations"][1]["ocean_current_velocity_kmh"], 0.3)
 
+    def test_converts_meters_per_second_to_kmh(self):
+        result = prepare_marine_history({
+            "units": {"ocean_current_velocity": "m/s"},
+            "observations": [
+                {"observed_at": "2026-10-23T09:00", "ocean_current_velocity": 1, "ocean_current_direction": 90}
+            ]
+        })
+        self.assertAlmostEqual(result["observations"][0]["ocean_current_velocity_kmh"], 3.6)
+
     def test_rejects_missing_current_data(self):
         with self.assertRaises(ValueError):
             prepare_marine_history({
