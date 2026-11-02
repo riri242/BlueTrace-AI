@@ -10,7 +10,7 @@ class MarineHistoryTests(unittest.IsolatedAsyncioTestCase):
             "hourly": {
                 "time": [
                     "2026-10-22T08:00",
-                    "2026-10-22T09:00",
+                    "2026-10-22T10:00",
                     "2026-10-23T09:00",
                     "2026-10-23T10:00",
                 ],
@@ -50,7 +50,7 @@ class MarineHistoryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(captured["start_date"], "2026-10-22")
         self.assertEqual(captured["end_date"], "2026-10-23")
         self.assertEqual(len(result["observations"]), 2)
-        self.assertEqual(result["observations"][0]["observed_at"], "2026-10-22T09:00")
+        self.assertEqual(result["observations"][0]["observed_at"], "2026-10-22T10:00")
         self.assertEqual(result["observations"][1]["observed_at"], "2026-10-23T09:00")
         self.assertEqual(result["observations"][1]["ocean_current_velocity"], 0.3)
 
