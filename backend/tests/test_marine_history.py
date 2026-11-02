@@ -7,6 +7,7 @@ from app.services.marine_service import MarineService
 class MarineHistoryTests(unittest.IsolatedAsyncioTestCase):
     async def test_history_filters_window_and_preserves_order(self):
         payload = {
+            "hourly_units": {"ocean_current_velocity": "km/h", "ocean_current_direction": "°"},
             "hourly": {
                 "time": [
                     "2026-10-22T08:00",
