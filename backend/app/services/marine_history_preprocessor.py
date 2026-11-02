@@ -7,6 +7,12 @@ def prepare_marine_history(history: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(observations, list) or not observations:
         raise ValueError("Marine history has no observations.")
 
+    units = history.get("units", {})
+    speed_unit = units.get("ocean_current_velocity", "km/h")
+    conversion = {"km/h": 1.0, "m/s": 3.6, "kn": 1.852, "mph": 1.609344}
+    if speed_unit not in conversion:
+        raise ValueError("Unsupported current velocity unit.")
+
     prepared = []
     for observation in observations:
         if not isinstance(observation, dict):
@@ -33,7 +39,7 @@ def prepare_marine_history(history: dict[str, Any]) -> dict[str, Any]:
 
         prepared.append({
             "observed_at": observed_at,
-            "ocean_current_velocity_kmh": float(velocity),
+            "ocean_current_velocity_kmh": float(velocity) * conversion[speed_unit],
             "ocean_current_direction_deg": float(direction),
             "wave_height_m": observation.get("wave_height"),
             "wave_direction_deg": observation.get("wave_direction"),
