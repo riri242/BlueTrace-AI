@@ -18,6 +18,16 @@ LIMITATIONS = (
 
 async def calculate_drift(request: DriftRequest, marine_service=None) -> dict:
     observed = datetime.combine(request.date, request.time)
+    local = observed.replace(tzinfo=ZONE)
+    if local.replace(fold=1).utcoffset() != local.replace(fold=0).utcoffset():
+        return {
+            "observation_date": request.date.isoformat(),
+            "observation_time": request.time.isoformat(timespec="minutes"),
+            "hours_requested": request.hours,
+            "limitations": LIMITATIONS,
+            "status": "unavailable",
+            "message": "Ambiguous or nonexistent daylight-saving local time; choose another observation time."
+        }
     now = datetime.now(ZONE).replace(tzinfo=None)
     base = {
         "observation_date": request.date.isoformat(),
@@ -55,6 +65,8 @@ async def calculate_drift(request: DriftRequest, marine_service=None) -> dict:
         **base,
         "status": "experimental",
         "hours_traced": result["hours_traced"],
+        "anchor_time": result["anchor_time"],
+        "observation_offset_minutes": round(offset_hours * 60, 2),
         "path": result["path"],
         "message": "Experimental current-only backward trace; not a source attribution.",
     }
