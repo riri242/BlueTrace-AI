@@ -9,7 +9,7 @@ def prepare_marine_history(history: dict[str, Any]) -> dict[str, Any]:
 
     units = history.get("units", {})
     speed_unit = units.get("ocean_current_velocity", "km/h")
-    conversion = {"km/h": 1.0, "m/s": 3.6, "kn": 1.852, "mph": 1.609344}
+    conversion = {"km/h": 1.0, "m/s": 3.6, "kn": 1.852, "knots": 1.852, "mph": 1.609344}
     if speed_unit not in conversion:
         raise ValueError("Unsupported current velocity unit.")
 
