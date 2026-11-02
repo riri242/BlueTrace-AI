@@ -65,3 +65,37 @@ Weather API 429 resilience is intentionally deferred; the drift endpoint does no
 - An observation from October 21, 2026 returned 23 hours of an experimental 24-hour requested track in a live user test (prior to these changes).
 
 **Outstanding:** Coastline intersection is not yet computationally verified; the displayed basemap is for human inspection, not a geographic land mask. The provider's directional convention has not been independently confirmed, and no reference trajectories have been used for scientific validation. Historical coverage outside the tested dates remains unverified. New code and tests require local execution.
+
+## Coastline screening setup and scientific status
+
+Install dependencies with `pip install -r requirements.txt` from backend.
+Set `BLUETRACE_LAND_GEOJSON` to an **existing** WGS84 GeoJSON
+FeatureCollection containing authoritative Monterey Bay land polygons.
+For example, in PowerShell:
+```powershell
+$env:BLUETRACE_LAND_GEOJSON="D:\\data\\monterey-land.geojson"
+```
+No authoritative coastline data file is bundled. If the environment variable is
+unset, the file is missing, or geometry cannot be loaded, the response is
+`coastline_status: not_checked` and MUST NOT be interpreted as clear.
+The screening intersects the entire polyline with polygonal land, not only
+individual vertices. A `clear_on_reference_map` result depends on the
+resolution and quality of the configured dataset.
+
+**Direction verification:** Open-Meteo Marine Weather API documentation defines
+`ocean_current_direction` as the direction **towards which** water flows:
+0° north, 90° east. The backward integration correctly subtracts the north
+and east components. This convention differs from wave direction (from which
+waves originate). Source: https://open-meteo.com/en/docs/marine-weather-api
+
+**Analytical verification:** Unit tests check zero-current displacement,
+1 km/h northward for one hour (~0.008993° latitude backward), and eastward
+currents moving backward west. These are synthetic reference cases, NOT
+validation against observed debris drifter trajectories.
+
+**Still needed before scientific closure:** supply and inspect authoritative
+Monterey land polygons, verify live coastline status on sample trajectories,
+run the new test suite, compare tracks against independent drifter/buoy
+observations, and quantify uncertainty. Open-Meteo warns that coastal current
+model accuracy is limited at its approximately 8 km resolution. Older dates
+may require the provider's historical forecast mode.
