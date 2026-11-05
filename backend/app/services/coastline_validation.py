@@ -1,6 +1,6 @@
-"""Conservative coastline screening with a locally supplied WGS84 land GeoJSON.
+"""Conservative California coast screening using WGS84 land polygons.
 
-Set BLUETRACE_LAND_GEOJSON to an authoritative land polygon dataset. A missing
+Set BLUETRACE_LAND_GEOJSON to override the local data/monterey_land.geojson. A missing
 or unreadable dataset never produces a 'clear' verdict. This is screening, not
 a shoreline collision model.
 """
