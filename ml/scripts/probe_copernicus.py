@@ -53,7 +53,7 @@ def main():
             "end_datetime": args.end,
             "output_directory": str(target),
             "output_filename": filename,
-            "overwrite_output_data": True,
+            "overwrite": True,
         }
         if kind == "currents":
             kwargs["minimum_depth"] = 0
