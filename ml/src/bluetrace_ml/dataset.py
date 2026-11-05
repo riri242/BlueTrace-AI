@@ -37,7 +37,11 @@ def make_24h_pairs(data: pd.DataFrame, hours: int = 24) -> pd.DataFrame:
     previous_time = grouped["time"].shift(hours)
     previous_lat = grouped["latitude"].shift(hours)
     previous_lon = grouped["longitude"].shift(hours)
-    valid = (ordered["time"] - previous_time).eq(pd.Timedelta(hours=hours))
+    step = grouped["time"].diff()
+    breaks = step.ne(pd.Timedelta(hours=1))
+    segment = breaks.groupby(ordered["ID"]).cumsum()
+    same_contiguous_segment = segment.eq(segment.groupby(ordered["ID"]).shift(hours))
+    valid = (ordered["time"] - previous_time).eq(pd.Timedelta(hours=hours)) & same_contiguous_segment
     pairs = ordered.loc[valid].copy()
     pairs["previous_latitude"] = previous_lat[valid].to_numpy()
     pairs["previous_longitude"] = previous_lon[valid].to_numpy()
