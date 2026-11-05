@@ -166,6 +166,32 @@ final training-ready dataset. The training-facing CSV may contain fewer
 than six independent drifters and cannot automatically satisfy the
 `train.py` split requirement.
 
+## Diverse NOAA sampling — preview before downloading
+
+The original multi-year pilot recovered 72 complete observations but only
+five independent drifters. The diversity-focused selector can inspect more
+distinct NOAA trajectories across separate compact time/space windows without
+issuing any marine API requests:
+
+```powershell
+python scripts/build_diverse.py --years 2010 2011 2015 2021 2022
+```
+
+The default preview selects up to three windows per year and up to 12
+observations per window (maximum 180 rows). It writes
+`data/interim/diverse/selection_report.json` and prints the number of
+distinct drifters, selected windows and records. Windows are restricted to
+short time spans and spatial extents. The selector favors drifters not yet
+selected. Examine `unique_drifters` and per-year breakdown **before**
+issuing any downloads. A larger row count does not guarantee more
+independent trajectories.
+
+Only after reviewing the preview, run the same command with `--download`
+to fetch Copernicus and ERA5 data. Completed individual batches are cached,
+but individual API requests may still fail or be rate-limited. The resultant
+environment.csv is an experimental snapshot table: no final inference or
+debris-origin accuracy claim is justified from it.
+
 ## Next research milestones
 
 1. Verify Copernicus data access at real NOAA times/locations and quantify
