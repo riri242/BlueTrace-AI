@@ -1,0 +1,28 @@
+name: BlueTrace ML checks
+
+on:
+  push:
+    branches: [feat/marine-environment-data]
+    paths:
+      - "ml/**"
+      - ".github/workflows/ml-ci.yml"
+  pull_request:
+    paths:
+      - "ml/**"
+      - ".github/workflows/ml-ci.yml"
+
+jobs:
+  test-ml:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ML package
+        working-directory: ml
+        run: python -m pip install -e ".[dev]"
+      - name: Run independent synthetic-data tests
+        working-directory: ml
+        run: python -m pytest -q
