@@ -112,6 +112,31 @@ python -m bluetrace_ml.train --noaa "data/raw/drifter_hourly_qc.csv" --environme
 
 When environmental training is enabled, the target becomes the **residual**\nbetween observed 24-hour displacement and a constant-current backtracking\nbaseline. XGBoost learns this residual; test reports compare the raw\nconstant-current estimate and the hybrid estimate. This simple current\nbaseline holds daily current fixed for 24 hours and is **not** a full\nLagrangian simulation. The environment feature table is **not generated\nor validated yet**. Offline inference lives in `bluetrace_ml.predict`.
 
+## First environmental coverage pilot (recommended next action)
+
+From `ml/`, after installing the `marine` extras and authenticating
+Copernicus Marine:
+
+```powershell
+python scripts/build_pilot.py --noaa "data/raw/drifter_hourly_qc.csv" --year 2011 --sample-size 24
+```
+
+This chooses one compact ~3-day period containing valid NOAA 24-hour
+backtracking labels, with up to 24 observations spread across drifters.
+It downloads **small study-region/time subsets** for GLORYS and WAVERYS,
+requests hourly ERA5 wind for sampled locations, and creates:
+
+- `data/interim/pilot/environment_pilot.csv` — aligned predictors,
+  source timestamps, grid locations and completeness flags.
+- `data/interim/pilot/coverage_report.json` — usable coverage per source.
+- `data/interim/pilot/marine/*.nc` — downloaded Copernicus subsets.
+
+The script performs **up to 24 ERA5 network calls**, requires Internet and
+Copernicus credentials, and can encounter API rate limits. It is a
+**coverage pilot, not a full training dataset**. Check the report and any
+unmatched records before launching larger historical downloads. Full
+training requires more drifters and a tested multi-year extractor.
+
 ## Next research milestones
 
 1. Verify Copernicus data access at real NOAA times/locations and quantify
