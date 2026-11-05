@@ -36,6 +36,7 @@ export function DriftPathMap({ path, coastlineStatus }: { path: DriftPoint[]; co
     const start = new mapboxgl.Marker({ color: "#146f94" }).setLngLat(points[0]).addTo(map);
     const end = new mapboxgl.Marker({ color: "#dc6a2d" }).setLngLat(points[points.length - 1]).addTo(map);
     const onLoad = () => {
+      if (map.getSource(sourceId)) return;
       map.addSource(sourceId, {
         type: "geojson",
         data: {
@@ -53,10 +54,10 @@ export function DriftPathMap({ path, coastlineStatus }: { path: DriftPoint[]; co
       const bounds = points.reduce((acc, point) => acc.extend(point), new mapboxgl.LngLatBounds(points[0], points[0]));
       map.fitBounds(bounds, { padding: 55, maxZoom: 12 });
     };
-    map.on("load", onLoad);
+    map.on("style.load", onLoad);
     return () => {
       window.removeEventListener("bluetrace-theme-change", handleThemeChange);
-      map.off("load", onLoad);
+      map.off("style.load", onLoad);
       start.remove();
       end.remove();
       map.remove();
