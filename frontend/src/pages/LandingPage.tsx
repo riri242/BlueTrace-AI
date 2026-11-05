@@ -28,7 +28,7 @@ export function LandingPage() {
             BlueTrace AI
           </h1>
           <p className="mt-6 max-w-2xl text-xl leading-8 text-research-muted">
-            AI-powered marine debris origin estimation and coastal intelligence.
+            Exploring marine debris observations and experimental source-region estimation along the California coast.
           </p>
           <div className="mt-9">
             <Link className={buttonStyles({ size: "lg" })} to="/analysis">
