@@ -264,7 +264,7 @@ export function AnalysisPage() {
           </p>
           {driftMutation.data.anchor_time ? (
             <p className="mt-2 text-sm text-research-muted">
-              Latest current reading: {driftMutation.data.anchor_time} (Monterey local time).
+              Latest current reading: {driftMutation.data.anchor_time} (California local time).
               Offset from observation: {driftMutation.data.observation_offset_minutes ?? "unknown"} minutes.
             </p>
           ) : null}
