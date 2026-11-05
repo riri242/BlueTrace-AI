@@ -41,7 +41,7 @@ async def calculate_drift(request: DriftRequest, marine_service=None) -> dict:
         return {**base, "status": "unavailable", "message": message}
 
     if observed > now:
-        return unavailable("Observation date/time is in the future for Monterey Bay.")
+        return unavailable("Observation date/time is in the future for California coast.")
 
     service = marine_service if marine_service is not None else MarineService()
     try:
