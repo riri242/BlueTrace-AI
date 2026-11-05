@@ -97,10 +97,14 @@ def build(noaa, years, sample_size, out_dir, *, reuse=True):
         raise ValueError("--sample-size must be 1..100")
     out_dir = Path(out_dir)
     pairs = make_24h_pairs(read_noaa(noaa))
+    selections = {}
+    for year in years:
+        selections[year] = select_observations(pairs, sample_size, year, 3)
+        print(f"Selected year {year}: {len(selections[year])} observations")
     batches = []
     manifests = []
     for year in years:
-        chosen = select_observations(pairs, sample_size, year, 3)
+        chosen = selections[year]
         output, info = run_batch(chosen, out_dir / "batches" / str(year), reuse=reuse)
         batches.append(output)
         manifests.append({"year": year, **info})
