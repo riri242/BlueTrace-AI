@@ -20,8 +20,7 @@ def test_only_contiguous_24h_pairs():
     data = frame(ids=(1,), periods=26)
     assert len(make_24h_pairs(data)) == 2
     gap = data.drop(index=10)
-    assert len(make_24h_pairs(gap)) == 1 if False else True
-    assert len(make_24h_pairs(gap)) == 2  # Endpoint-only continuity is addressed by the strict gap check.
+    assert len(make_24h_pairs(gap)) == 0
 
 
 def test_splits_exclude_shared_drifters():
