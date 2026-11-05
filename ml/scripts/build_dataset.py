@@ -23,6 +23,52 @@ else:
     from build_pilot import select_observations, subset_marine, sample_grid, sample_era5, PRODUCTS
 
 
+
+def available_years(pairs, sample_size=24):
+    """Return years with at least one compact NOAA sampling window."""
+    available = []
+    for year in sorted(pairs["time"].dt.year.unique()):
+        if int(year) < 1993:
+            continue
+        try:
+            sample = select_observations(pairs, sample_size, int(year), 3)
+        except ValueError:
+            continue
+        available.append({
+            "year": int(year),
+            "selected_observations": int(len(sample)),
+            "selected_drifters": int(sample["ID"].nunique()),
+            "eligible_pairs": int(pairs["time"].dt.year.eq(year).sum()),
+        })
+    return available
+
+
+def choose_years(available, count=3):
+    """Pick chronologically separated feasible years, without guessing dates."""
+    if len(available) < count:
+        raise ValueError(
+            f"Only {len(available)} eligible years found; need {count}. "
+            "Run --list-years to inspect available coverage."
+        )
+    indices = np.linspace(0, len(available) - 1, num=count).round().astype(int)
+    return [available[int(index)]["year"] for index in indices]
+
+
+def resolve_years(pairs, years, sample_size):
+    feasible = available_years(pairs, sample_size)
+    if years is None:
+        return choose_years(feasible)
+    known = {entry["year"] for entry in feasible}
+    missing = sorted(set(years) - known)
+    if missing:
+        raise ValueError(
+            f"No compact 24-hour NOAA sampling window for years: {missing}. "
+            f"Eligible years: {sorted(known)}. "
+            "Use --auto-years or --list-years."
+        )
+    return years
+
+
 def fingerprint(frame):
     canonical = frame[["ID", "time", "latitude", "longitude"]].copy()
     canonical["time"] = pd.to_datetime(canonical["time"], utc=True).dt.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -94,12 +140,13 @@ def run_batch(frame, out_dir, *, reuse=True):
 
 
 def build(noaa, years, sample_size, out_dir, *, reuse=True):
-    if not years or len(set(years)) != len(years):
+    if years is not None and (not years or len(set(years)) != len(years)):
         raise ValueError("Select one or more distinct years")
     if not 1 <= sample_size <= 100:
         raise ValueError("--sample-size must be 1..100")
     out_dir = Path(out_dir)
     pairs = make_24h_pairs(read_noaa(noaa))
+    years = resolve_years(pairs, years, sample_size)
     selections = {}
     for year in years:
         selections[year] = select_observations(pairs, sample_size, year, 3)
@@ -142,11 +189,20 @@ def build(noaa, years, sample_size, out_dir, *, reuse=True):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--noaa", default="data/raw/drifter_hourly_qc.csv")
-    p.add_argument("--years", nargs="+", type=int, default=[2005, 2011, 2018])
+    selection = p.add_mutually_exclusive_group()
+    selection.add_argument("--years", nargs="+", type=int)
+    selection.add_argument("--auto-years", action="store_true", help="Automatically select three eligible, separated years")
+    selection.add_argument("--list-years", action="store_true", help="Show eligible NOAA years without downloading")
     p.add_argument("--sample-size", type=int, default=24)
     p.add_argument("--output", default="data/interim/multiyear")
     p.add_argument("--refresh", action="store_true", help="Re-download and validate batches even if cached")
     args = p.parse_args()
+    if args.list_years:
+        pairs = make_24h_pairs(read_noaa(args.noaa))
+        print(json.dumps({"eligible_years": available_years(pairs, args.sample_size)}, indent=2))
+        return
+    if not args.years and not args.auto_years:
+        p.error("Choose --auto-years, --list-years, or --years YEAR [YEAR ...]")
     build(args.noaa, args.years, args.sample_size, args.output, reuse=not args.refresh)
 
 
