@@ -16,7 +16,10 @@ from pathlib import Path
 import pandas as pd
 
 from bluetrace_ml.dataset import make_24h_pairs, read_noaa
-from build_dataset import run_batch
+if __package__:
+    from .build_dataset import run_batch
+else:
+    from build_dataset import run_batch
 
 
 def select_windows(pairs, years, *, windows_per_year=3, rows_per_window=12,
