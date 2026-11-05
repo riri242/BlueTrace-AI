@@ -98,7 +98,7 @@ export function AnalysisPage() {
         transition={{ duration: 0.45, ease: "easeOut" }}
       >
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-ocean-600">
-          Monterey Bay observation
+          California coast observation
         </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-research-ink sm:text-5xl">
           Analysis Intake
@@ -133,7 +133,7 @@ export function AnalysisPage() {
                 Observation Site
               </p>
               <h2 className="mt-2 text-2xl font-semibold text-research-ink">
-                Monterey Bay Map
+                California Coast Map
               </h2>
             </div>
             <MontereyMap
@@ -200,7 +200,7 @@ export function AnalysisPage() {
 
         <div className="flex flex-col gap-4 rounded-2xl border border-research-line bg-white/82 p-5 shadow-research sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm leading-6 text-research-muted">
-            Image, date, time, and Monterey Bay observation site are required before
+            Image, date, time, and California coast observation site are required before
             submission.
           </p>
           <div className="flex flex-wrap items-center gap-3">
