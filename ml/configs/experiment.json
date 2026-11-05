@@ -1,0 +1,16 @@
+{
+  "seed": 42,
+  "horizon_hours": 24,
+  "test_fraction": 0.15,
+  "validation_fraction": 0.15,
+  "max_spatial_match_degrees": 0.3,
+  "xgboost": {
+    "n_estimators": 450,
+    "max_depth": 5,
+    "learning_rate": 0.04,
+    "subsample": 0.85,
+    "colsample_bytree": 0.85,
+    "tree_method": "hist",
+    "n_jobs": 4
+  }
+}
