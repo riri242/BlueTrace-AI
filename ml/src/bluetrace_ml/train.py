@@ -15,6 +15,7 @@ from .dataset import make_24h_pairs, read_noaa
 from .evaluate import score
 from .features import make_features
 from .splits import grouped_indices
+from .physics import constant_current_backtrack
 
 
 def run(noaa_csv: str, output_dir: str, config_file: str,
@@ -32,19 +33,21 @@ def run(noaa_csv: str, output_dir: str, config_file: str,
     use_environment = environment_csv is not None
     features = make_features(data, use_environment)
     targets = data[["target_east_km", "target_north_km"]].to_numpy(dtype=float)
+    physical_offsets = constant_current_backtrack(data, hours) if use_environment else np.zeros_like(targets)
+    regression_target = targets - physical_offsets
     splits = grouped_indices(data, seed=config["seed"],
                              test_fraction=config["test_fraction"],
                              validation_fraction=config["validation_fraction"])
     model = XGBRegressor(random_state=config["seed"], objective="reg:squarederror",
                          **config["xgboost"])
-    model.fit(features.iloc[splits["train"]], targets[splits["train"]],
-              eval_set=[(features.iloc[splits["validation"]], targets[splits["validation"]])],
+    model.fit(features.iloc[splits["train"]], regression_target[splits["train"]],
+              eval_set=[(features.iloc[splits["validation"]], regression_target[splits["validation"]])],
               verbose=False)
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     report = {
-        "model": "xgboost_multioutput_24h_offset",
-        "mode": "environmental" if use_environment else "location_only_experimental",
+        "model": "hybrid_fixed_current_plus_xgboost_residual" if use_environment else "xgboost_multioutput_24h_offset",
+        "mode": "hybrid_environmental_experimental" if use_environment else "location_only_experimental",
         "production_ready": False,
         "environment_coverage": coverage,
         "rows": int(len(data)),
@@ -59,11 +62,13 @@ def run(noaa_csv: str, output_dir: str, config_file: str,
             "rows": int(len(indices)),
             "drifters": sorted(str(v) for v in subset["ID"].unique()),
         }
-        observed = model.predict(features.iloc[indices])
+        observed = model.predict(features.iloc[indices]) + physical_offsets[indices]
         report["metrics"][name] = {
             "xgboost": score(subset, observed),
             "no_movement": score(subset, np.zeros((len(indices), 2))),
         }
+        if use_environment:
+            report["metrics"][name]["constant_current"] = score(subset, physical_offsets[indices])
         if name == "test":
             dummy = DummyRegressor(strategy="mean")
             dummy.fit(features.iloc[splits["train"]], targets[splits["train"]])
