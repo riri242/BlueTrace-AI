@@ -98,16 +98,21 @@ export function AnalysisPage() {
         transition={{ duration: 0.45, ease: "easeOut" }}
       >
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-ocean-600">
-          California coast observation
+          COASTAL OBSERVATION · CALIFORNIA
         </p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-research-ink sm:text-5xl">
-          Analysis Intake
+          Explore an observation
         </h1>
         <p className="mt-4 text-lg leading-8 text-research-muted">
-          Provide the field image, observation time, and a single coastal
-          location for the Milestone 1 API workflow.
+          Upload a marine debris image, mark the observation on the California coast, and explore environmental conditions and experimental drift estimates.
         </p>
       </motion.div>
+
+      <div className="mb-7 flex flex-wrap gap-2" aria-label="Analysis workflow steps">
+        {["01 · Upload an image", "02 · Pin a coastal location", "03 · Explore conditions"].map((step) => (
+          <span key={step} className="rounded-full border border-research-line bg-white/80 px-4 py-2 text-xs font-semibold tracking-wide text-research-muted dark:border-cyan-400/20 dark:bg-cyan-400/5 dark:text-cyan-100">{step}</span>
+        ))}
+      </div>
 
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
@@ -200,8 +205,7 @@ export function AnalysisPage() {
 
         <div className="flex flex-col gap-4 rounded-2xl border border-research-line bg-white/82 p-5 shadow-research sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm leading-6 text-research-muted">
-            Image, date, time, and California coast observation site are required before
-            submission.
+            Select a coastal observation and time. The drift estimate is experimental; full image analysis also requires an upload.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <label className="text-sm font-medium text-research-ink" htmlFor="drift-hours">
