@@ -38,3 +38,29 @@ def test_completed_cache_requires_matching_fingerprint(monkeypatch, tmp_path):
     reused, manifest = build_dataset.run_batch(sample, output)
     assert len(reused) == 2
     assert manifest["state"] == "complete"
+
+
+def test_available_years_skips_unavailable_periods(monkeypatch):
+    times = pd.to_datetime(["2003-01-01T00:00:00Z", "2011-01-01T00:00:00Z", "2018-01-01T00:00:00Z"], utc=True)
+    pairs = pd.DataFrame({"ID": [1, 2, 3], "time": times,
+                          "latitude": [36.8] * 3, "longitude": [-122.0] * 3})
+    def fake_select(pairs, sample_size, year, days):
+        if year == 2003:
+            raise ValueError("No eligible window")
+        return pairs.loc[pairs["time"].dt.year.eq(year)].copy()
+    monkeypatch.setattr(build_dataset, "select_observations", fake_select)
+    choices = build_dataset.available_years(pairs)
+    assert [item["year"] for item in choices] == [2011, 2018]
+    assert build_dataset.resolve_years(pairs, [2011], 24) == [2011]
+
+
+def test_auto_selection_requires_enough_years():
+    import pytest
+    available = [{"year": 2001}, {"year": 2011}]
+    with pytest.raises(ValueError, match="Only 2 eligible"):
+        build_dataset.choose_years(available, count=3)
+
+
+def test_auto_selection_spreads_years():
+    years = [{"year": 2001 + i} for i in range(9)]
+    assert build_dataset.choose_years(years, 3) == [2001, 2005, 2009]
