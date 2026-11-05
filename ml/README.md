@@ -143,11 +143,11 @@ After the successful 24-row pilot, use the bounded multi-year builder.
 From `ml/` with Copernicus Marine credentials:
 
 ```powershell
-python scripts/build_dataset.py --years 2005 2011 2018 --sample-size 24
+python scripts/build_dataset.py --list-years
+python scripts/build_dataset.py --auto-years --sample-size 24
 ```
 
-The builder prechecks that NOAA has suitable compact windows in all
-requested years. For each year it downloads a small spatial/time slice of
+The builder lists the actual NOAA years with suitable compact windows.\n`--auto-years` picks three chronologically separated eligible years without\nguessing dates; explicit `--years 2011 ...` is also supported.\nThe builder prechecks that NOAA has suitable compact windows in all\nrequested years. For each year it downloads a small spatial/time slice of
 GLORYS daily currents and WAVERYS 3-hour wave fields, plus point-specific
 ERA5 winds. It saves source provenance and completeness information under
 `data/interim/multiyear/batches/<year>/`, and combines complete feature rows
@@ -156,8 +156,7 @@ into `data/interim/multiyear/environment.csv`, with a summary
 
 Repeating the command reuses a completed batch only when its selected
 NOAA ID/time/coordinates fingerprint matches. Use `--refresh` to
-re-download. If a year has no suitable NOAA compact window, choose
-different years; no download will occur before year-window validation.
+re-download. If an explicit year has no suitable NOAA compact window, the error lists\neligible years; no download occurs before year-window validation.
 
 **Important:** Three small windows (72 observations total at most) assess
 feasibility only; they do not produce an independently validated model.
