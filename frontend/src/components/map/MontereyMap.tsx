@@ -27,7 +27,8 @@ interface MontereyMapProps {
 type MapStatus = "loading" | "ready" | "error";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN?.trim() ?? "";
-const MAP_STYLE = "mapbox://styles/mapbox/navigation-day-v1";
+const DAY_STYLE = "mapbox://styles/mapbox/navigation-day-v1";
+const NIGHT_STYLE = "mapbox://styles/mapbox/navigation-night-v1";
 const CALIFORNIA_COAST_CENTER: LngLatLike = [-121.2, 37.0];
 
 // Study-area bounds keep the marker workflow focused on California coast only.
@@ -124,7 +125,7 @@ export function MontereyMap({
       maxZoom: MAX_ZOOM,
       minZoom: MIN_ZOOM,
       pitchWithRotate: false,
-      style: MAP_STYLE,
+      style: document.documentElement.classList.contains("dark") ? NIGHT_STYLE : DAY_STYLE,
       zoom: INITIAL_ZOOM
     });
 
@@ -159,6 +160,12 @@ export function MontereyMap({
       onChangeRef.current(coordinates);
     };
 
+    const handleThemeChange = (event: Event) => {
+      const theme = (event as CustomEvent<"dark" | "light">).detail;
+      map.setStyle(theme === "dark" ? NIGHT_STYLE : DAY_STYLE);
+    };
+    window.addEventListener("bluetrace-theme-change", handleThemeChange);
+
     map.on("load", handleLoad);
     map.on("error", handleError);
     map.on("click", handleClick);
@@ -166,6 +173,7 @@ export function MontereyMap({
     mapRef.current = map;
 
     return () => {
+      window.removeEventListener("bluetrace-theme-change", handleThemeChange);
       map.off("load", handleLoad);
       map.off("error", handleError);
       map.off("click", handleClick);
@@ -213,7 +221,7 @@ export function MontereyMap({
   return (
     <div className={["space-y-4", className].filter(Boolean).join(" ")}>
       <div
-        className="relative h-[22rem] min-h-[20rem] overflow-hidden rounded-2xl border border-research-line bg-ocean-50 shadow-inner sm:h-[26rem] lg:h-[30rem]"
+        className="relative h-[22rem] min-h-[20rem] overflow-hidden rounded-2xl border border-research-line bg-ocean-50 shadow-inner sm:h-[26rem] lg:h-[30rem] dark:bg-slate-950"
         id={id}
       >
         <div
