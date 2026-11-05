@@ -24,10 +24,10 @@ export function AppLayout({ children }: AppLayoutProps) {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
     document.documentElement.style.colorScheme = theme;
+    window.dispatchEvent(new CustomEvent("bluetrace-theme-change", { detail: theme }));
     try {
       localStorage.setItem("bluetrace-theme", theme);
     } catch {
-      // Browser storage may be unavailable; theme still works for this session.
     }
   }, [theme]);
 
