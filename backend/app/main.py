@@ -9,7 +9,7 @@ settings = get_settings()
 app = FastAPI(
     title=settings.app_name,
     version="0.1.0",
-    description="Milestone 1 intake API for BlueTrace AI.",
+    description="California coast observation and experimental drift API for BlueTrace AI.",
 )
 
 app.add_middleware(

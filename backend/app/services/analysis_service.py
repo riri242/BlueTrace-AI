@@ -66,30 +66,35 @@ async def create_analysis_response(
 
     try:
         detections = ObjectDetectionService().detect(image_path=str(temp_path))
-        environment = await EnvironmentService().get_environment(
+        conditions = await EnvironmentService().get_environment(
             latitude=payload.latitude,
             longitude=payload.longitude,
             date=payload.date.isoformat(),
             time=payload.time.strftime("%H:%M"),
         )
+        weather = conditions["weather"]
+        marine = conditions["marine"]
         prediction = (
             LocationClassifier().classify(
                 detections=detections,
-                environment=environment,
+                environment=weather,
             )
-            if environment is not None
+            if weather is not None
             else None
         )
     finally:
         temp_path.unlink(missing_ok=True)
 
+    if weather is not None and marine is not None:
+        message = "Analysis completed successfully."
+    elif weather is None and marine is None:
+        message = "Object detection completed. Weather and marine data are unavailable."
+    else:
+        message = "Object detection completed. Some environmental data is unavailable."
+
     return AnalysisResponse(
         status="success",
-        message=(
-            "Analysis completed successfully."
-            if environment is not None
-            else "Object detection completed. Weather data is temporarily unavailable; location classification was skipped."
-        ),
+        message=message,
         received=ReceivedPayload(
             date=payload.date.isoformat(),
             time=payload.time.isoformat(timespec="minutes"),
@@ -97,7 +102,8 @@ async def create_analysis_response(
             longitude=payload.longitude,
             image=image_metadata,
         ),
-        environment=environment,
+        environment=weather,
+        marine=marine,
         detections=detections,
         prediction=prediction,
     )
