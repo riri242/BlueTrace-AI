@@ -23,8 +23,8 @@ coverage limit generalization.
 | --- | --- | --- | --- |
 | NOAA GDP | ID, UTC time, coordinates; ve/vn excluded from inference features | Hourly | Actual CSV audited |
 | Open-Meteo ERA5 Archive | 10 m wind speed/direction | Hourly | Six historical API samples returned valid winds |
-| Copernicus GLORYS12V1 | uo/vo sea-water velocity | **Daily mean** | Metadata verified; actual sample **not yet downloaded** |
-| Copernicus WAVERYS | VSDX/VSDY Stokes drift, VHM0 waves | **3-hourly instantaneous** | Metadata verified; actual sample **not yet downloaded** |
+| Copernicus GLORYS12V1 | uo/vo sea-water velocity | **Daily mean** | 2011 pilot downloaded and sampled successfully (24/24) |
+| Copernicus WAVERYS | VSDX/VSDY Stokes drift, VHM0 waves | **3-hourly instantaneous** | 2011 pilot downloaded and sampled successfully (24/24) |
 
 **Do not call WAVERYS hourly or GLORYS hourly.** Avoid joining daily/3-hourly
 fields as if they were hourly independent measurements. Both sampled grid
@@ -136,6 +136,36 @@ Copernicus credentials, and can encounter API rate limits. It is a
 **coverage pilot, not a full training dataset**. Check the report and any
 unmatched records before launching larger historical downloads. Full
 training requires more drifters and a tested multi-year extractor.
+
+## Resumable multi-year coverage check
+
+After the successful 24-row pilot, use the bounded multi-year builder.
+From `ml/` with Copernicus Marine credentials:
+
+```powershell
+python scripts/build_dataset.py --years 2005 2011 2018 --sample-size 24
+```
+
+The builder prechecks that NOAA has suitable compact windows in all
+requested years. For each year it downloads a small spatial/time slice of
+GLORYS daily currents and WAVERYS 3-hour wave fields, plus point-specific
+ERA5 winds. It saves source provenance and completeness information under
+`data/interim/multiyear/batches/<year>/`, and combines complete feature rows
+into `data/interim/multiyear/environment.csv`, with a summary
+`coverage_report.json`.
+
+Repeating the command reuses a completed batch only when its selected
+NOAA ID/time/coordinates fingerprint matches. Use `--refresh` to
+re-download. If a year has no suitable NOAA compact window, choose
+different years; no download will occur before year-window validation.
+
+**Important:** Three small windows (72 observations total at most) assess
+feasibility only; they do not produce an independently validated model.
+The builder uses current-location environmental snapshots, not a
+24-hour time-varying physics integration. Do not represent this as a
+final training-ready dataset. The training-facing CSV may contain fewer
+than six independent drifters and cannot automatically satisfy the
+`train.py` split requirement.
 
 ## Next research milestones
 
