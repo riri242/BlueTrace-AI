@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/Card";
 const foundationItems = [
   "Observation intake",
   "Coastal location capture",
-  "Validated research metadata"
+  "Experimental drift tracing"
 ];
 
 export function LandingPage() {
@@ -22,35 +22,36 @@ export function LandingPage() {
           transition={{ duration: 0.55, ease: "easeOut" }}
         >
           <p className="mb-5 text-sm font-semibold uppercase tracking-[0.24em] text-ocean-600">
-            Academic coastal intelligence
+            CALIFORNIA COAST · EXPERIMENTAL MARINE RESEARCH
           </p>
-          <h1 className="text-5xl font-semibold tracking-tight text-research-ink sm:text-6xl lg:text-7xl">
-            BlueTrace AI
+          <h1 className="text-5xl font-semibold tracking-tight text-research-ink sm:text-6xl lg:text-7xl dark:text-white">
+            Trace the <span className="bg-gradient-to-r from-ocean-600 to-cyan-400 bg-clip-text text-transparent dark:from-cyan-300 dark:to-blue-400">unseen.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-xl leading-8 text-research-muted">
-            AI-powered marine debris origin estimation and coastal intelligence.
+            BlueTrace AI brings computer vision, ocean conditions, and experimental drift analysis together to explore the story behind marine debris along California’s coast.
           </p>
-          <div className="mt-9">
+          <div className="mt-9 flex flex-wrap items-center gap-5">
             <Link className={buttonStyles({ size: "lg" })} to="/analysis">
-              Start Analysis
+              Explore the Coast →
             </Link>
+            <span className="text-xs font-medium uppercase tracking-widest text-research-muted dark:text-slate-400">Research prototype · Not a verified debris origin</span>
           </div>
         </motion.div>
 
         <motion.div
           animate={{ opacity: 1, scale: 1 }}
-          className="mx-auto w-full max-w-xl"
+          className="mx-auto w-full max-w-xl rounded-[2.5rem] border border-cyan-500/10 p-3 shadow-2xl shadow-cyan-950/10 dark:border-cyan-300/15 dark:bg-white/[0.03] dark:shadow-cyan-950/30"
           initial={{ opacity: 0, scale: 0.96 }}
           transition={{ delay: 0.12, duration: 0.6, ease: "easeOut" }}
         >
-          <HeroIllustration />
+          <div className="overflow-hidden rounded-[2rem] dark:brightness-90"><HeroIllustration /></div>
         </motion.div>
       </section>
 
-      <section className="border-y border-research-line bg-white/72">
+      <section className="border-y border-research-line bg-white/72 dark:border-white/10 dark:bg-slate-950/40">
         <div className="mx-auto grid max-w-7xl gap-4 px-5 py-8 sm:px-8 md:grid-cols-3">
           {foundationItems.map((item) => (
-            <Card className="p-5 shadow-none" key={item} tone="soft">
+            <Card className="p-5 shadow-none transition-transform hover:-translate-y-1" key={item} tone="soft">
               <p className="text-sm font-semibold text-research-ink">{item}</p>
             </Card>
           ))}

@@ -6,23 +6,22 @@ from pydantic import BaseModel, Field
 
 from app.schemas.environment import EnvironmentData
 from app.schemas.location import LocationPrediction
-from app.utils.geo import MONTEREY_BAY_BOUNDS
+from app.schemas.marine import MarineData
+from app.utils.geo import CALIFORNIA_COAST_BOUNDS
 
 
 class AnalysisRequest(BaseModel):
     date: DateType
     time: TimeType
-
     latitude: float = Field(
         ...,
-        ge=MONTEREY_BAY_BOUNDS.latitude_min,
-        le=MONTEREY_BAY_BOUNDS.latitude_max,
+        ge=CALIFORNIA_COAST_BOUNDS.latitude_min,
+        le=CALIFORNIA_COAST_BOUNDS.latitude_max,
     )
-
     longitude: float = Field(
         ...,
-        ge=MONTEREY_BAY_BOUNDS.longitude_min,
-        le=MONTEREY_BAY_BOUNDS.longitude_max,
+        ge=CALIFORNIA_COAST_BOUNDS.longitude_min,
+        le=CALIFORNIA_COAST_BOUNDS.longitude_max,
     )
 
 
@@ -46,22 +45,14 @@ class Detection(BaseModel):
     confidence: float
     category: str
     blue_trace_relevance: str
-
     bounding_box: dict[str, float]
 
 
 class AnalysisResponse(BaseModel):
     status: Literal["success"]
-
     message: str
-
     received: ReceivedPayload
-
     environment: EnvironmentData | None = None
-
-    detections: list[Detection] = Field(
-        default_factory=list,
-        description="Objects detected by the YOLO model.",
-    )
-
+    marine: MarineData | None = None
+    detections: list[Detection] = Field(default_factory=list)
     prediction: LocationPrediction | None = None

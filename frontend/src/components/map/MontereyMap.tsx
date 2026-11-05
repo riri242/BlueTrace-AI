@@ -18,7 +18,7 @@ interface MontereyMapProps {
   error?: string;
   /** Optional DOM id for labels, analytics, or end-to-end tests. */
   id?: string;
-  /** Emits the selected Monterey Bay observation coordinates to the parent. */
+  /** Emits the selected California coast observation coordinates to the parent. */
   onChange: (coordinates: Coordinates) => void;
   /** Controlled marker position. Pass null to clear the current marker. */
   value: Coordinates | null;
@@ -27,16 +27,17 @@ interface MontereyMapProps {
 type MapStatus = "loading" | "ready" | "error";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN?.trim() ?? "";
-const MAP_STYLE = "mapbox://styles/mapbox/navigation-day-v1";
-const MONTEREY_BAY_CENTER: LngLatLike = [-121.93, 36.8];
+const DAY_STYLE = "mapbox://styles/mapbox/navigation-day-v1";
+const NIGHT_STYLE = "mapbox://styles/mapbox/navigation-night-v1";
+const CALIFORNIA_COAST_CENTER: LngLatLike = [-121.2, 37.0];
 
-// Study-area bounds keep the marker workflow focused on Monterey Bay only.
-const MONTEREY_BAY_BOUNDS: LngLatBoundsLike = [
-  [-122.32, 36.42],
-  [-121.68, 37.12]
+// Study-area bounds keep the marker workflow focused on California coast only.
+const CALIFORNIA_COAST_BOUNDS: LngLatBoundsLike = [
+  [-125.0, 32.0],
+  [-117.0, 42.0]
 ];
-const INITIAL_ZOOM = 9.15;
-const MIN_ZOOM = 8.55;
+const INITIAL_ZOOM = 5.1;
+const MIN_ZOOM = 4.5;
 const MAX_ZOOM = 13.25;
 
 function createObservationMarkerElement() {
@@ -75,7 +76,7 @@ function setMarker(
 export function MontereyMap({
   className = "",
   error,
-  id = "monterey-map",
+  id = "california-coast-map",
   onChange,
   value
 }: MontereyMapProps) {
@@ -89,7 +90,7 @@ export function MontereyMap({
     MAPBOX_TOKEN ? "loading" : "error"
   );
   const [mapError, setMapError] = useState<string | null>(
-    MAPBOX_TOKEN ? null : "Set VITE_MAPBOX_TOKEN to enable the Monterey Bay map."
+    MAPBOX_TOKEN ? null : "Set VITE_MAPBOX_TOKEN to enable the California coast map."
   );
 
   useEffect(() => {
@@ -107,7 +108,7 @@ export function MontereyMap({
 
     if (!MAPBOX_TOKEN) {
       setMapStatus("error");
-      setMapError("Set VITE_MAPBOX_TOKEN to enable the Monterey Bay map.");
+      setMapError("Set VITE_MAPBOX_TOKEN to enable the California coast map.");
       return;
     }
 
@@ -117,14 +118,14 @@ export function MontereyMap({
 
     const map = new mapboxgl.Map({
       attributionControl: true,
-      center: MONTEREY_BAY_CENTER,
+      center: CALIFORNIA_COAST_CENTER,
       container: containerRef.current,
       dragRotate: false,
-      maxBounds: MONTEREY_BAY_BOUNDS,
+      maxBounds: CALIFORNIA_COAST_BOUNDS,
       maxZoom: MAX_ZOOM,
       minZoom: MIN_ZOOM,
       pitchWithRotate: false,
-      style: MAP_STYLE,
+      style: document.documentElement.classList.contains("dark") ? NIGHT_STYLE : DAY_STYLE,
       zoom: INITIAL_ZOOM
     });
 
@@ -144,7 +145,7 @@ export function MontereyMap({
       if (!hasLoadedRef.current) {
         setMapStatus("error");
         setMapError(
-          "Unable to load the Monterey Bay map. Check the Mapbox token and network connection."
+          "Unable to load the California coast map. Check the Mapbox token and network connection."
         );
       }
     };
@@ -159,6 +160,12 @@ export function MontereyMap({
       onChangeRef.current(coordinates);
     };
 
+    const handleThemeChange = (event: Event) => {
+      const theme = (event as CustomEvent<"dark" | "light">).detail;
+      map.setStyle(theme === "dark" ? NIGHT_STYLE : DAY_STYLE);
+    };
+    window.addEventListener("bluetrace-theme-change", handleThemeChange);
+
     map.on("load", handleLoad);
     map.on("error", handleError);
     map.on("click", handleClick);
@@ -166,6 +173,7 @@ export function MontereyMap({
     mapRef.current = map;
 
     return () => {
+      window.removeEventListener("bluetrace-theme-change", handleThemeChange);
       map.off("load", handleLoad);
       map.off("error", handleError);
       map.off("click", handleClick);
@@ -213,11 +221,11 @@ export function MontereyMap({
   return (
     <div className={["space-y-4", className].filter(Boolean).join(" ")}>
       <div
-        className="relative h-[22rem] min-h-[20rem] overflow-hidden rounded-2xl border border-research-line bg-ocean-50 shadow-inner sm:h-[26rem] lg:h-[30rem]"
+        className="relative h-[22rem] min-h-[20rem] overflow-hidden rounded-2xl border border-research-line bg-ocean-50 shadow-inner sm:h-[26rem] lg:h-[30rem] dark:bg-slate-950"
         id={id}
       >
         <div
-          aria-label="Interactive Monterey Bay observation site map"
+          aria-label="Interactive California coast observation site map"
           className={[
             "h-full w-full transition-opacity duration-300",
             mapStatus === "ready" ? "opacity-100" : "opacity-30"
@@ -233,7 +241,7 @@ export function MontereyMap({
           >
             <div className="flex items-center gap-3 rounded-full border border-ocean-100 bg-white/92 px-4 py-3 text-sm font-medium text-research-muted shadow-sm">
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-ocean-100 border-t-ocean-600" />
-              Loading Monterey Bay map...
+              Loading California coast map...
             </div>
           </div>
         ) : null}
@@ -264,7 +272,7 @@ export function MontereyMap({
         </dl>
       ) : (
         <p className="text-sm leading-6 text-research-muted">
-          Click once inside Monterey Bay, California to select the observation
+          Click once within the California coast study area to select the observation
           site. Clicking again moves the existing marker and updates latitude and
           longitude.
         </p>
