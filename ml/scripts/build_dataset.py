@@ -17,7 +17,10 @@ import pandas as pd
 
 from bluetrace_ml.dataset import make_24h_pairs, read_noaa
 from bluetrace_ml.features import ENVIRONMENT_FEATURES
-from build_pilot import select_observations, subset_marine, sample_grid, sample_era5, PRODUCTS
+if __package__:
+    from .build_pilot import select_observations, subset_marine, sample_grid, sample_era5, PRODUCTS
+else:
+    from build_pilot import select_observations, subset_marine, sample_grid, sample_era5, PRODUCTS
 
 
 def fingerprint(frame):
