@@ -76,6 +76,12 @@ BlueTrace AI/
 │       ├── styles/
 │       └── types/
 │
+├── ml/
+│   ├── src/bluetrace_ml/
+│   ├── configs/
+│   ├── scripts/
+│   └── tests/
+│
 ├── backend/
 │   └── app/
 │       ├── core/
@@ -162,6 +168,10 @@ The endpoint processes the observation and returns the available environmental i
 - Open-Meteo Historical Weather API (ERA5) has hourly weather reanalysis back to 1940, but the existing `WeatherService` uses the **Historical Forecast API** (approximately 2022 onward). For training with 1992–2022 drifters, use ERA5 archive rather than assuming the current service covers those years.
 - Open-Meteo ERA5-Ocean is historical *wave reanalysis*, not a validated historical ocean-current source. The overlap probe found 24/24 hourly wind and wave values but 0/24 current velocity/direction values at every one of six sampled date/location combinations in 1992, 2011, and 2022. Do not fill those absent currents with zero or train on them as if observed. Run `python scripts/check_open_meteo_overlap.py` from `backend` to reproduce the checks.\n- Historical current candidate: Copernicus Marine GLORYS12V1 (`GLOBAL_MULTIYEAR_PHY_001_030`, 1993 onwards, daily eastward/northward sea-water velocity at ~1/12-degree). Another candidate is NASA OSCAR v2.0, daily surface currents from 1993 at ~0.25-degree. Daily resolution is **not** hourly; align it explicitly and evaluate its limitations for 24-hour origin estimates. Verify actual values and licensing/access for a California spatial/temporal sample before use.\n- NOAA 1992 drifter observations predate the cited 1993 current reanalysis: either omit them from the current-enhanced dataset or use a separately validated source.
 - Before joining NOAA and Open-Meteo, align timestamps in UTC, account for the grid-cell mismatch, and split by drifter ID to prevent data leakage. Do not train from present-day marine values attached to old drifter observations. 
+
+## Machine learning research workspace
+
+The `ml/` workspace implements a separate, reproducible NOAA drifter modeling prototype. It includes group-disjoint splits, geodesic evaluation, a location-only XGBoost sanity check, an optional fixed-current plus XGBoost residual model, strict environment feature validation, and an independently tested Copernicus sample-download probe. No integrated environmental training data or validated debris model has been produced yet. See [ml/README.md](ml/README.md) for installation, dataset provenance, evaluation constraints and commands.
 
 ## Development Status
 
