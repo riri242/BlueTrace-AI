@@ -8,9 +8,9 @@ class GeoBounds(BaseModel):
     longitude_max: float
 
 
-MONTEREY_BAY_BOUNDS = GeoBounds(
-    latitude_min=36.42,
-    latitude_max=37.12,
-    longitude_min=-122.32,
-    longitude_max=-121.68,
+CALIFORNIA_COAST_BOUNDS = GeoBounds(
+    latitude_min=32.0,
+    latitude_max=42.0,
+    longitude_min=-125.0,
+    longitude_max=-117.0,
 )
