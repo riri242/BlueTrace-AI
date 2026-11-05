@@ -17,11 +17,20 @@ export function DriftPathMap({ path, coastlineStatus }: { path: DriftPoint[]; co
     mapboxgl.accessToken = TOKEN;
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: "mapbox://styles/mapbox/navigation-day-v1",
+      style: document.documentElement.classList.contains("dark")
+        ? "mapbox://styles/mapbox/navigation-night-v1"
+        : "mapbox://styles/mapbox/navigation-day-v1",
       center: [path[0].longitude, path[0].latitude],
       zoom: 10
     });
     mapRef.current = map;
+    const handleThemeChange = (event: Event) => {
+      const theme = (event as CustomEvent<"dark" | "light">).detail;
+      map.setStyle(theme === "dark"
+        ? "mapbox://styles/mapbox/navigation-night-v1"
+        : "mapbox://styles/mapbox/navigation-day-v1");
+    };
+    window.addEventListener("bluetrace-theme-change", handleThemeChange);
     const points = path.map((point) => [point.longitude, point.latitude] as [number, number]);
     const sourceId = "drift-path";
     const start = new mapboxgl.Marker({ color: "#146f94" }).setLngLat(points[0]).addTo(map);
@@ -46,6 +55,7 @@ export function DriftPathMap({ path, coastlineStatus }: { path: DriftPoint[]; co
     };
     map.on("load", onLoad);
     return () => {
+      window.removeEventListener("bluetrace-theme-change", handleThemeChange);
       map.off("load", onLoad);
       start.remove();
       end.remove();
