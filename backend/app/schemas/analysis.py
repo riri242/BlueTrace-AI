@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from app.schemas.environment import EnvironmentData
 from app.schemas.location import LocationPrediction
 from app.schemas.marine import MarineData
-from app.utils.geo import MONTEREY_BAY_BOUNDS
+from app.utils.geo import CALIFORNIA_COAST_BOUNDS
 
 
 class AnalysisRequest(BaseModel):
@@ -15,13 +15,13 @@ class AnalysisRequest(BaseModel):
     time: TimeType
     latitude: float = Field(
         ...,
-        ge=MONTEREY_BAY_BOUNDS.latitude_min,
-        le=MONTEREY_BAY_BOUNDS.latitude_max,
+        ge=CALIFORNIA_COAST_BOUNDS.latitude_min,
+        le=CALIFORNIA_COAST_BOUNDS.latitude_max,
     )
     longitude: float = Field(
         ...,
-        ge=MONTEREY_BAY_BOUNDS.longitude_min,
-        le=MONTEREY_BAY_BOUNDS.longitude_max,
+        ge=CALIFORNIA_COAST_BOUNDS.longitude_min,
+        le=CALIFORNIA_COAST_BOUNDS.longitude_max,
     )
 
 
