@@ -1,10 +1,10 @@
 # BlueTrace AI
 
-**AI-powered marine debris analysis and origin estimation.**
+**Experimental marine debris analysis and source-region research along the California coast.**
 
-BlueTrace AI is a research-oriented platform exploring how **computer vision, environmental data, and geospatial analysis** can be combined to analyze marine debris and estimate potential origins.
+BlueTrace AI is a research-oriented platform exploring how **computer vision, environmental data, and geospatial analysis** can be combined to analyze marine debris and explore potential source regions. The current backward-drift calculation is an experimental baseline, not a trained origin-prediction model.
 
-The system processes marine debris observations — including an image, geographic location, date, and time — through an analysis pipeline incorporating **YOLO-based object detection, environmental data, and location scoring**.
+The California coast study area is an initial bounding box (32–42°N, 125–117°W), not a water-only mask. The system processes marine debris observations — including an image, geographic location, date, and time — through an analysis pipeline incorporating **YOLO-based object detection, environmental data, and location scoring**.
 
 > **Status:** 🚧 Active development. The analysis pipeline is functional, with ongoing work on model validation and prediction quality.
 
@@ -44,7 +44,7 @@ Observation
    Location Scoring
           │
           ▼
-    Origin Estimate
+    Experimental Location Scoring
 ```
 
 ## Tech Stack
@@ -154,7 +154,7 @@ Accepts a marine debris observation using `multipart/form-data`.
 
 The endpoint processes the observation and returns the available environmental information, object detections, and prediction results.
 
-## Development Status
+## California coast migration and historical training data\n\n- API input bounds and Mapbox observation map now cover California coast rather than Monterey Bay.\n- The existing local coastline file path remains `backend/data/monterey_land.geojson` for compatibility. It must contain California-wide or global WGS84 land polygons. A Monterey-only clipping is **not sufficient**. A missing/unreadable file produces `not_checked`, never a clear verdict. The land intersection test does not simulate beaching.\n- NOAA hourly drifter trajectories are the candidate supervised-learning labels for a future 24-hour previous-position model; the model is **not implemented or trained** yet. The coastline migration does not change the existing YOLO model.\n- Open-Meteo Historical Weather API (ERA5) has hourly weather reanalysis back to 1940, but the existing `WeatherService` uses the **Historical Forecast API** (approximately 2022 onward). For training with 1992–2022 drifters, use ERA5 archive rather than assuming the current service covers those years.\n- Open-Meteo Marine documentation lists ERA5-Ocean back to 1940, but verify that the exact ocean-current variables are actually populated at the drifter dates/locations. Run `python scripts/check_open_meteo_overlap.py` from `backend` to sample 1992, 2011, and 2022 in GMT/UTC. The probe is not exhaustive and does not establish model quality.\n- Before joining NOAA and Open-Meteo, align timestamps in UTC, account for the grid-cell mismatch, and split by drifter ID to prevent data leakage. Do not train from present-day marine values attached to old drifter observations.\n\n## Development Status
 
 BlueTrace AI is an **active research and engineering project**. The current implementation includes the core observation workflow, YOLO-based detection, environmental-data integration, and an initial location-scoring pipeline.
 
