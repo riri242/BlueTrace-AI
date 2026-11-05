@@ -72,14 +72,13 @@ export function FileUpload({
         ) : (
           <div className="max-w-sm space-y-3">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-ocean-600">
-              Image Upload
+              01 · MARINE DEBRIS IMAGE
             </p>
             <h2 className="text-2xl font-semibold text-research-ink">
-              Drag and Drop
+              Drop a photo to begin
             </h2>
             <p className="text-sm leading-6 text-research-muted">
-              or choose a clear beach observation image for this Milestone 1
-              submission.
+              or choose a clear image of marine debris to explore its coastal context.
             </p>
           </div>
         )}
