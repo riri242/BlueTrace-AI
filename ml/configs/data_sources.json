@@ -1,0 +1,38 @@
+{
+  "study_area": {"latitude_min": 32, "latitude_max": 42, "longitude_min": -125, "longitude_max": -117},
+  "labels": {
+    "name": "NOAA GDP hourly quality-controlled drifters",
+    "source": "https://erddap.aoml.noaa.gov/gdp/erddap/tabledap/drifter_hourly_qc.html",
+    "status": "local_file_audited",
+    "first_sample_utc": "1992-11-21T21:00:00Z",
+    "last_sample_utc": "2022-10-23T22:00:00Z",
+    "rows": 145194,
+    "unique_drifters": 156,
+    "continuous_24h_pairs": 137739
+  },
+  "wind": {
+    "product": "Open-Meteo ERA5 archive",
+    "source": "https://archive-api.open-meteo.com/v1/archive",
+    "variables": ["wind_speed_10m", "wind_direction_10m"],
+    "status": "historical_sample_api_verified",
+    "time_resolution": "hourly"
+  },
+  "currents": {
+    "product": "GLOBAL_MULTIYEAR_PHY_001_030",
+    "dataset": "cmems_mod_glo_phy_my_0.083deg_P1D-m",
+    "source": "https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/services",
+    "variables": ["uo", "vo"],
+    "status": "metadata_verified_actual_sample_unverified",
+    "start_date": "1993-01-01",
+    "time_resolution": "daily_mean"
+  },
+  "waves": {
+    "product": "GLOBAL_MULTIYEAR_WAV_001_032",
+    "dataset": "cmems_mod_glo_wav_my_0.2deg_PT3H-i",
+    "source": "https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_WAV_001_032/services",
+    "variables": ["VSDX", "VSDY", "VHM0"],
+    "status": "metadata_verified_actual_sample_unverified",
+    "start_date": "1980-01-01",
+    "time_resolution": "three_hourly_instantaneous"
+  }
+}
