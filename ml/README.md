@@ -110,7 +110,7 @@ After building and validating the feature table:
 python -m bluetrace_ml.train --noaa "data/raw/drifter_hourly_qc.csv" --environment "data/processed/environment.csv" --output "artifacts/environmental"
 ```
 
-The environment feature table is **not generated or validated yet**.
+When environmental training is enabled, the target becomes the **residual**\nbetween observed 24-hour displacement and a constant-current backtracking\nbaseline. XGBoost learns this residual; test reports compare the raw\nconstant-current estimate and the hybrid estimate. This simple current\nbaseline holds daily current fixed for 24 hours and is **not** a full\nLagrangian simulation. The environment feature table is **not generated\nor validated yet**. Offline inference lives in `bluetrace_ml.predict`.
 
 ## Next research milestones
 
