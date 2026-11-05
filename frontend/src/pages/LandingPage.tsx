@@ -30,20 +30,21 @@ export function LandingPage() {
           <p className="mt-6 max-w-2xl text-xl leading-8 text-research-muted">
             BlueTrace AI brings computer vision, ocean conditions, and experimental drift analysis together to explore the story behind marine debris along California’s coast.
           </p>
-          <div className="mt-9">
+          <div className="mt-9 flex flex-wrap items-center gap-5">
             <Link className={buttonStyles({ size: "lg" })} to="/analysis">
               Explore the Coast →
             </Link>
+            <span className="text-xs font-medium uppercase tracking-widest text-research-muted dark:text-slate-400">Research prototype · Not a verified debris origin</span>
           </div>
         </motion.div>
 
         <motion.div
           animate={{ opacity: 1, scale: 1 }}
-          className="mx-auto w-full max-w-xl"
+          className="mx-auto w-full max-w-xl rounded-[2.5rem] border border-cyan-500/10 p-3 shadow-2xl shadow-cyan-950/10 dark:border-cyan-300/15 dark:bg-white/[0.03] dark:shadow-cyan-950/30"
           initial={{ opacity: 0, scale: 0.96 }}
           transition={{ delay: 0.12, duration: 0.6, ease: "easeOut" }}
         >
-          <HeroIllustration />
+          <div className="overflow-hidden rounded-[2rem] dark:brightness-90"><HeroIllustration /></div>
         </motion.div>
       </section>
 
