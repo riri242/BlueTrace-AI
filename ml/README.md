@@ -192,6 +192,40 @@ but individual API requests may still fail or be rate-limited. The resultant
 environment.csv is an experimental snapshot table: no final inference or
 debris-origin accuracy claim is justified from it.
 
+## Model V2: robustness evaluation on the completed diverse dataset
+
+After the 180-record, 63-drifter environmental extraction succeeded, run a
+strict experimental robustness evaluation instead of interpreting one favorable
+hold-out split as proof of generalization:
+
+```powershell
+python -m pytest -q
+python -m bluetrace_ml.robustness \
+  --noaa "data/raw/drifter_hourly_qc.csv" \
+  --environment "data/interim/diverse/environment.csv" \
+  --output "artifacts/hybrid_v2_evaluation"
+```
+
+The script repeats group-disjoint train/validation/test splits with five
+different random seeds, then independently evaluates held-out whole years.
+For year holdouts, every drifter seen in that year is excluded entirely from
+training and validation—even if it was observed in another year. Each fold
+compares Hybrid Physics–XGBoost, constant-current backtracking and
+no-movement **on exactly the same test records**. Outputs are written
+to `artifacts/hybrid_v2_evaluation/robustness.json`; the CLI prints aggregate
+mean errors, variation and number of wins over the physics baseline.
+
+Read the fold-level results, group sizes and held-out-year results. Do not
+interpret the seed-level mean and standard deviation as confidence intervals:
+the folds overlap. A year split with too few disjoint drifters is skipped;
+report how many year tests were performed rather than assuming all five.
+The resulting statistics are **exploratory**, not production-ready.
+The script neither changes the existing `hybrid_v1` model nor deploys it.
+
+The next experiment should extend the data beyond 180 observations and
+integrate currents/wind/Stokes across the full preceding 24 hours. This V2
+assessment does **not** implement a time-varying trajectory integrator.
+
 ## Next research milestones
 
 1. Verify Copernicus data access at real NOAA times/locations and quantify
