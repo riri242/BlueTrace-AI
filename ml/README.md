@@ -226,6 +226,41 @@ The next experiment should extend the data beyond 180 observations and
 integrate currents/wind/Stokes across the full preceding 24 hours. This V2
 assessment does **not** implement a time-varying trajectory integrator.
 
+## V3: 24-hour temporal environmental pilot (cached marine grids)
+
+Before expanding downloads or changing the fitted model, inspect whether
+historical marine grids and ERA5 contain 24 hourly-aligned predictors
+at the observation location. The script reads the **already downloaded**
+Copernicus grids from the `diverse` dataset directory; it will **not**
+contact Copernicus again. It does call Open-Meteo once for each selected
+observation (default **3 requests**) to obtain hourly historical winds:
+
+```powershell
+python -m pytest -q
+python scripts/build_temporal.py --max-observations 3
+```
+
+The output `data/interim/temporal_pilot/temporal_pilot.csv` includes
+per-channel mean and standard deviation, timestamp coverage and a simple
+24-step constant-location current sum. `coverage_report.json` counts
+observations with all six channels present for all 24 samples.
+
+Matching uses the latest source grid timestamp at/before each target UTC
+hour, with explicit source age tolerances and no grid timestamps after
+the observation date. **This is not a promise of real-time
+information availability.** The GLORYS daily-mean time label can
+represent a retrospective whole-day aggregate, so it can contain
+information from later that calendar day. For a strictly prospective
+forecast or real-time deployment, use a timestamp-released operational
+product or lag daily aggregates until their real availability time.
+The pilot is explicitly **retrospective**, and uses a fixed observed
+location rather than following an advected trajectory.
+
+If the first three examples have good coverage, the next phase can
+rework extraction for larger numbers of independently sampled drifters,
+cache ERA5 requests, and build a spatially evolving 24h backtracking
+integrator. This code does **not** fit a V3 model or replace `hybrid_v1`.
+
 ## Next research milestones
 
 1. Verify Copernicus data access at real NOAA times/locations and quantify
