@@ -98,8 +98,13 @@ def run(*, noaa, root, output, max_observations=3, max_distance_degrees=0.4):
     (output_dir / "paths.json").write_text(
         json.dumps(paths, indent=2), encoding="utf-8",
     )
+    common = result.loc[result["current_error_km"].notna() & result["current_plus_stokes_error_km"].notna()]
     report = {
         "observations": len(rows),
+        "common_completed_observations": int(len(common)),
+        "common_subset_mean_current_only_error_km": float(common["current_error_km"].mean()) if len(common) else None,
+        "common_subset_mean_current_plus_stokes_error_km": float(common["current_plus_stokes_error_km"].mean()) if len(common) else None,
+        "common_subset_mean_no_movement_error_km": float(common["no_movement_error_km"].mean()) if len(common) else None,
         "completed_current_only": int(result["current_status"].eq("complete").sum()),
         "completed_current_plus_stokes": int(result["current_plus_stokes_status"].eq("complete").sum()),
         "mean_current_only_error_km": (
