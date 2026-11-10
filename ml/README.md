@@ -261,6 +261,41 @@ rework extraction for larger numbers of independently sampled drifters,
 cache ERA5 requests, and build a spatially evolving 24h backtracking
 integrator. This code does **not** fit a V3 model or replace `hybrid_v1`.
 
+## V3 spatially evolving backward-trajectory pilot
+
+The existing 3-observation temporal pilot reported full 24-hour
+fixed-location predictor coverage. To test a **moving spatial trajectory**
+without authenticating to Copernicus again, use cached GLORYS and WAVERYS
+NetCDF files from the diverse extraction:
+
+```powershell
+python -m pytest -q
+python scripts/trace_trajectory.py --max-observations 3
+```
+
+The new `bluetrace_ml.trajectory` module performs 24 one-hour backward
+Euler steps. At each step it retrieves the latest timestamped ocean field
+at or before that step, samples the nearest cell at the **updated** modeled
+location, and subtracts the water velocity. It optionally adds WAVERYS
+Stokes drift to the current, as an uncalibrated experiment. Missing values,
+stale fields, exceeded spatial coverage and domain exits are **reported as
+incomplete**, not silently extrapolated.
+
+`data/interim/trajectory_pilot/comparison.csv` compares complete traces
+to NOAA's actual 24h previous position, alongside a no-movement baseline.
+`paths.json` records the hourly positions and field source labels.
+`report.json` reports completion and preliminary mean error. Compare
+errors only on a common set of completed traces; different success counts
+make aggregate means misleading.
+
+This pilot is **not Model V3 training** and does not modify saved
+hybrid models. Cached grids were downloaded around observation locations
+for narrow time spans; modeled trajectories may leave the cache and fail.
+The daily GLORYS fields are retrospective time averages, not point-in-time
+operational forecasts. Windage, wave-current coupling, coastline/land
+collisions, stranding, spatial interpolation and uncertainty are not yet
+modeled. Testing three drifters does not establish predictive accuracy.
+
 ## Next research milestones
 
 1. Verify Copernicus data access at real NOAA times/locations and quantify
